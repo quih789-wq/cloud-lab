@@ -4,6 +4,7 @@ import axios from 'axios';
 function App() {
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState({ name: '', studentId: '', email: '', major: '' });
+  const [editingId, setEditingId] = useState(null);
 
   // Lấy danh sách sinh viên
   const fetchStudents = async () => {
@@ -19,19 +20,38 @@ function App() {
     fetchStudents();
   }, []);
 
-  // Thêm sinh viên mới
+  // Thêm hoặc Cập nhật sinh viên
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/students', form);
+      if (editingId) {
+        // Gọi API PUT để sửa sinh viên (Câu 61)
+        await axios.put(`/api/students/${editingId}`, form);
+        setEditingId(null);
+      } else {
+        // Gọi API POST để thêm sinh viên (Câu 49)
+        await axios.post('/api/students', form);
+      }
       setForm({ name: '', studentId: '', email: '', major: '' });
       fetchStudents();
     } catch (err) {
-      alert('Lỗi thêm sinh viên: ' + (err.response?.data?.message || err.message));
+      alert('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
 
-  // Xóa sinh viên
+  // Chọn sinh viên để sửa
+  const handleEdit = (sv) => {
+    setEditingId(sv._id);
+    setForm({ name: sv.name, studentId: sv.studentId, email: sv.email, major: sv.major });
+  };
+
+  // Hủy chế độ sửa
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm({ name: '', studentId: '', email: '', major: '' });
+  };
+
+  // Xóa sinh viên (Câu 62)
   const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc muốn xóa sinh viên này?')) {
       try {
@@ -47,7 +67,7 @@ function App() {
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
       <h2>Quản Lý Sinh Viên (MERN Stack)</h2>
 
-      {/* Form thêm sinh viên */}
+      {/* Form nhập dữ liệu */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
         <input 
           placeholder="Họ và tên" 
@@ -73,10 +93,11 @@ function App() {
           onChange={(e) => setForm({ ...form, major: e.target.value })} 
           required 
         /> {' '}
-        <button type="submit">Thêm Sinh Viên</button>
+        <button type="submit">{editingId ? 'Cập Nhật' : 'Thêm Sinh Viên'}</button>
+        {editingId && <button type="button" onClick={handleCancelEdit} style={{ marginLeft: '5px' }}>Hủy</button>}
       </form>
 
-      {/* Bảng danh sách sinh viên */}
+      {/* Bảng hiển thị */}
       <table border="1" cellPadding="10" cellSpacing="0">
         <thead>
           <tr>
@@ -95,6 +116,7 @@ function App() {
               <td>{sv.email}</td>
               <td>{sv.major}</td>
               <td>
+                <button onClick={() => handleEdit(sv)}>Sửa</button> {' '}
                 <button onClick={() => handleDelete(sv._id)}>Xóa</button>
               </td>
             </tr>

@@ -2,7 +2,7 @@ name: Build and Push to Docker Hub
 
 on:
   push:
-    branches: [ "main" ] # Hoặc "master" tùy thuộc vào nhánh code chính của bạn
+    branches: [ "main" ]
 
 jobs:
   build-and-push:
@@ -17,7 +17,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build và đẩy Frontend (Thư mục client trong dự án của bạn)
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
         with:
@@ -26,11 +25,10 @@ jobs:
           push: true
           tags: quih789/mern-frontend:latest
 
-      # Build và đẩy Backend (Thư mục server trong dự án của bạn dựa theo danh sách file bên trái)
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
-          context: ./server
-          file: ./server/Dockerfile
+          context: ./mern-demo
+          file: ./mern-demo/Dockerfile
           push: true
           tags: quih789/mern-backend:latest

@@ -21,7 +21,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./client
-          file: ./client/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: quih789/mern-frontend:latest
 
@@ -29,6 +29,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./mern-demo
-          file: ./mern-demo/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: quih789/mern-backend:latest
